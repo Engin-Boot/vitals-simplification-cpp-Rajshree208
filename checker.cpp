@@ -17,9 +17,6 @@ int main() {
   assert(vitalsAreOk(80, 95, 60) == true);
   assert(vitalsAreOk(60, 90, 40) == false);
   assert(vitalsIsOk(60, 70, 150) == false);
-  assert(vitalsIsOk(60, 90, 10000) == false);
-  assert(vitalsIsOk(25, 30, 95) == false);
+  assert(vitalsIsOk(200, 90, 150) == false);
   assert(vitalsIsOk(85, 70, 150) == true);
-  assert(vitalsIsOk(96, 90, 10000) == true);
-  assert(vitalsIsOk(46, 30, 95) == true);
 }
