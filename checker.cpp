@@ -1,13 +1,13 @@
 #include <assert.h>
 
 bool bpmIsOk(float bpm){
-return (bpm<70 && bpm>150)
+return (bpm<70 && bpm>150);
 }
 bool spo2IsOk(float spo2){
-return (spo2>90)
+return (spo2>90);
 }
 bool respIsOk(float resp){
-return (resp>30 && resp<95)
+return (resp>30 && resp<95);
 }
 
 bool vitalsAreOk(float bpm, float spo2, float respRate) {
