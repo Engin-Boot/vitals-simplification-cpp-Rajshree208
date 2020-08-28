@@ -74,10 +74,9 @@ public:
 
 
 int main() {
-	Alert* alert;
 	AlertWithSms alertSms;
 	AlertWithAlarm alertAlarm;
 	VitalsCheck checkVitals;
-	checkVitals.vitalsAreOk(&alertSms,80, 95, 60);
+	checkVitals.vitalsAreOk(&alertSms,80, 85, 60);
 	checkVitals.vitalsAreOk(&alertAlarm,60, 90, 40);
 }
