@@ -28,7 +28,16 @@ public:
 	}
 };
 
-const int vitalLimits[3][2] = { {70,150},{90,INT_MAX},{30,95} };
+
+struct VitalParameters
+{
+	const int total_no_vitals;
+	string vital_names[5];
+	float vital_values[5];
+};
+
+
+const int vitalLimits[5][2] = { {70,150},{90,INT_MAX},{30,95},{60,150},{90,120} };
 
 class VitalsCheck
 {
@@ -51,30 +60,30 @@ public:
 		return true;
 	}
 
-	bool vitalsAreOk(Alert* alert,float vitalValues[], std::string vitalNames[], int total_no_of_vitals) {
+	bool vitalsAreOk(Alert* alert, struct VitalParameters* p) {
 		int countOfTrueValues = 0;
-		int vitalsStatus[] = { vitalsIsOk(alert ,vitalNames[0],vitalValues[0], vitalLimits[0][0],vitalLimits[0][1]),
-				       vitalsIsOk(alert,vitalNames[1],vitalValues[1],vitalLimits[1][0],vitalLimits[1][1]),
-				       vitalsIsOk(alert,vitalNames[2],vitalValues[2], vitalLimits[2][0],vitalLimits[2][1]) };
-		for (bool status : vitalsStatus)
+		bool vitalStatus;
+		for(int i = 0; i< p->total_no_vitals; i++)
 		{
-			if (status == 1)
+			vitalStatus = vitalsIsOk(alert, p->vital_names[i], p->vital_values[i], vitalLimits[i][0], vitalLimits[i][1]);
+			if(vitalStatus==1)
+			{
 				countOfTrueValues++;
+			}
 		}
-		return (countOfTrueValues == total_no_of_vitals);
+		return (countOfTrueValues == p->total_no_vitals);
 	}
 };
 
 int main() {
-	
+
 	AlertWithSms alertSms;
 	AlertWithAlarm alertAlarm;
 	VitalsCheck checkVitals;
+	
+	VitalParameters patient1 = {5, { "BPM", "SPO2", "RESPIRATORY","BLOODPRESSURE","HEARTRATE" },{40,89,100,50,130}};
+	VitalParameters patient2 = { 5, { "BPM", "SPO2", "RESPIRATORY","BLOODPRESSURE","HEARTRATE" },{160,49,90,120,100} };
 
-	int total_no_of_vitals = 3;
-	float vitalValues[] = {40,85,20};
-	std::string vitalNames[] = { "BPM", "SPO2", "RESPIRATORY" };
-
-	checkVitals.vitalsAreOk(&alertSms,vitalValues,vitalNames,total_no_of_vitals);
-	checkVitals.vitalsAreOk(&alertAlarm, vitalValues, vitalNames, total_no_of_vitals);
+	checkVitals.vitalsAreOk(&alertSms,&patient1);
+	checkVitals.vitalsAreOk(&alertAlarm,&patient2);
 }
