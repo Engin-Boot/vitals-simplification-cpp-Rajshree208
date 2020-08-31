@@ -4,11 +4,6 @@
 #include <iostream>
 using namespace std;
 
-const int bpmlimits[] = { 70,150 };
-const int spo2min = 90;
-const int resplimits[] = { 30,95 };
-const std::string vitalNames[] = { "BPM", "SPO2", "RESPIRATORY" };
-
 class Alert
 {
 public:
@@ -33,6 +28,8 @@ public:
 	}
 };
 
+const int vitalLimits[3][2] = { {70,150},{90,INT_MAX},{30,95} };
+
 class VitalsCheck
 {
 public:
@@ -41,14 +38,12 @@ public:
 
 		if (value < lower)
 		{
-			//std::cout << vitalName << "-->" << value << " is lower than the expected lower value -->" << lower << std::endl;
 			string message = "IS LOW !!";
 			alert->sendAlert(vitalName, message);
 			return false;
 		}
-		if (value > upper)
+		else if (value > upper)
 		{
-			//std::cout << vitalName << "-->" << value << " is higher than the expected upper value -->" << upper << std::endl;
 			string message = "IS HIGH !!";
 			alert->sendAlert(vitalName, message);
 			return false;
@@ -56,27 +51,30 @@ public:
 		return true;
 	}
 
-	bool vitalsAreOk(Alert* alert, float bpm, float spo2, float respRate) {
+	bool vitalsAreOk(Alert* alert,float vitalValues[], std::string vitalNames[], int total_no_of_vitals) {
 		int countOfTrueValues = 0;
-		const int total_no_of_parameters = 3;
-		int vitalsStatus[total_no_of_parameters] = { vitalsIsOk(alert ,vitalNames[0],bpm, bpmlimits[0],bpmlimits[1]),
-							     vitalsIsOk(alert,vitalNames[1],spo2,spo2min,INT_MAX),
-		     					     vitalsIsOk(alert,vitalNames[2],respRate, resplimits[0],resplimits[1]) };
-
-		for (int i = 0; i < total_no_of_parameters; i++) {
-			if (vitalsStatus[i] == 1) {
+		int vitalsStatus[] = { vitalsIsOk(alert ,vitalNames[0],vitalValues[0], vitalLimits[0][0],vitalLimits[0][1]),
+				       vitalsIsOk(alert,vitalNames[1],vitalValues[1],vitalLimits[1][0],vitalLimits[1][1]),
+				       vitalsIsOk(alert,vitalNames[2],vitalValues[2], vitalLimits[2][0],vitalLimits[2][1]) };
+		for (bool status : vitalsStatus)
+		{
+			if (status == 1)
 				countOfTrueValues++;
-			}
 		}
-		return (countOfTrueValues == total_no_of_parameters);
+		return (countOfTrueValues == total_no_of_vitals);
 	}
 };
 
-
 int main() {
+	
 	AlertWithSms alertSms;
 	AlertWithAlarm alertAlarm;
 	VitalsCheck checkVitals;
-	checkVitals.vitalsAreOk(&alertSms,80, 85, 60);
-	checkVitals.vitalsAreOk(&alertAlarm,60, 90, 40);
+
+	int total_no_of_vitals = 3;
+	float vitalValues[] = {40,85,20};
+	std::string vitalNames[] = { "BPM", "SPO2", "RESPIRATORY" };
+
+	checkVitals.vitalsAreOk(&alertSms,vitalValues,vitalNames,total_no_of_vitals);
+	checkVitals.vitalsAreOk(&alertAlarm, vitalValues, vitalNames, total_no_of_vitals);
 }
