@@ -29,11 +29,22 @@ public:
 };
 
 
-struct VitalParameters
+class VitalParameters
 {
-	const int total_no_vitals;
-	string vital_names[5];
-	float vital_values[5];
+public:
+	int total_no_vitals;
+	int* a = NULL;  
+	string* vital_names = NULL;
+	float* vital_values = NULL;
+	VitalParameters(int t, string* vitalNames, float* vitalValues)
+	{
+		total_no_vitals = t;
+		a = new int[total_no_vitals];
+		vital_names = new string[total_no_vitals];
+		vital_values = new float[total_no_vitals];
+		copy(vitalNames,vitalNames+t,vital_names);
+		copy(vitalValues, vitalValues + t, vital_values);
+	}
 };
 
 
@@ -60,7 +71,7 @@ public:
 		return true;
 	}
 
-	bool vitalsAreOk(Alert* alert, struct VitalParameters* p) {
+	bool vitalsAreOk(Alert* alert, VitalParameters* p) {
 		int countOfTrueValues = 0;
 		bool vitalStatus;
 		for(int i = 0; i< p->total_no_vitals; i++)
@@ -81,9 +92,14 @@ int main() {
 	AlertWithAlarm alertAlarm;
 	VitalsCheck checkVitals;
 	
-	VitalParameters patient1 = {5, { "BPM", "SPO2", "RESPIRATORY","BLOODPRESSURE","HEARTRATE" },{40,89,100,50,130}};
-	VitalParameters patient2 = { 5, { "BPM", "SPO2", "RESPIRATORY","BLOODPRESSURE","HEARTRATE" },{160,49,90,120,100} };
+	string vitalNames1[] = { "BPM", "SPO2", "RESPIRATORY","BLOODPRESSURE","HEARTRATE" };
+	float vitalValues1[] = { 40,89,100,50,130 };
+	VitalParameters vitalsForPatient1(5,vitalNames1 , vitalValues1);
 
-	checkVitals.vitalsAreOk(&alertSms,&patient1);
-	checkVitals.vitalsAreOk(&alertAlarm,&patient2);
+	string vitalNames2[] = { "BPM", "SPO2", "RESPIRATORY" };
+	float vitalValues2[] = { 80,90,45 };
+	VitalParameters vitalsForPatient2(3, vitalNames2, vitalValues2);
+
+	checkVitals.vitalsAreOk(&alertSms,&vitalsForPatient1);
+	checkVitals.vitalsAreOk(&alertAlarm,&vitalsForPatient2);
 }
