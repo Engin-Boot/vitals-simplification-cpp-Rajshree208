@@ -2,6 +2,7 @@
 #include <climits>
 #include <string>
 #include <iostream>
+#include <map>
 using namespace std;
 
 class Alert
@@ -28,6 +29,20 @@ public:
 	}
 };
 
+std::map<string, int> map_lowerlimit = {
+	{ "BPM", 70 },
+	{ "SPO2", 90 },
+	{ "RESPIRATORY", 30},
+	{"BLOODPRESSURE",60 },
+	{"HEARTRATE",90 }
+};
+std::map<string, int> map_upperlimit = {
+	{ "BPM", 150 },
+	{ "SPO2", INT_MAX },
+	{ "RESPIRATORY", 95},
+	{"BLOODPRESSURE",150 },
+	{"HEARTRATE", 120 }
+};
 
 class VitalParameters
 {
@@ -36,8 +51,7 @@ public:
 	int* a = NULL;  
 	string* vital_names = NULL;
 	float* vital_values = NULL;
-	VitalParameters(int t, string* vitalNames, float* vitalValues)
-	{
+	VitalParameters(int t, string* vitalNames, float* vitalValues) {
 		total_no_vitals = t;
 		a = new int[total_no_vitals];
 		vital_names = new string[total_no_vitals];
@@ -46,9 +60,6 @@ public:
 		copy(vitalValues, vitalValues + t, vital_values);
 	}
 };
-
-
-const int vitalLimits[5][2] = { {70,150},{90,INT_MAX},{30,95},{60,150},{90,120} };
 
 class VitalsCheck
 {
@@ -76,7 +87,8 @@ public:
 		bool vitalStatus;
 		for(int i = 0; i< p->total_no_vitals; i++)
 		{
-			vitalStatus = vitalsIsOk(alert, p->vital_names[i], p->vital_values[i], vitalLimits[i][0], vitalLimits[i][1]);
+			string vitalname = p->vital_names[i];
+			vitalStatus = vitalsIsOk(alert, p->vital_names[i], p->vital_values[i], map_lowerlimit[vitalname], map_upperlimit[vitalname]);
 			if(vitalStatus==1)
 			{
 				countOfTrueValues++;
@@ -92,12 +104,14 @@ int main() {
 	AlertWithAlarm alertAlarm;
 	VitalsCheck checkVitals;
 	
-	string vitalNames1[] = { "BPM", "SPO2", "RESPIRATORY","BLOODPRESSURE","HEARTRATE" };
-	float vitalValues1[] = { 40,89,100,50,130 };
+	string vitalNames1[] = { "BPM", "RESPIRATORY","SPO2" ,"BLOODPRESSURE","HEARTRATE" };
+	float vitalValues1[] = { 40,89,99,50,130 };
+
 	VitalParameters vitalsForPatient1(5,vitalNames1 , vitalValues1);
 
 	string vitalNames2[] = { "BPM", "SPO2", "RESPIRATORY" };
 	float vitalValues2[] = { 80,90,45 };
+
 	VitalParameters vitalsForPatient2(3, vitalNames2, vitalValues2);
 
 	checkVitals.vitalsAreOk(&alertSms,&vitalsForPatient1);
